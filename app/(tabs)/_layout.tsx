@@ -1,45 +1,142 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
-
+import VehicleRegistrationGuard from '@/app/layout/VehicleRegistrationGuard';
 import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
+    <VehicleRegistrationGuard>
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: colors.tint,
+          tabBarInactiveTintColor: colors.icon,
+          headerShown: false,
+          tabBarButton: HapticTab,
+          tabBarBackground: TabBarBackground,
+          tabBarStyle: Platform.select({
+            ios: {
+              position: 'absolute',
+              backgroundColor: colors.background,
+              borderTopColor: colors.card,
+              borderTopWidth: 1,
+            },
+            android: {
+              backgroundColor: colors.background,
+              borderTopColor: colors.card,
+              borderTopWidth: 1,
+              elevation: 8,
+            },
+            default: {
+              backgroundColor: colors.background,
+              borderTopColor: colors.card,
+              borderTopWidth: 1,
+            },
+          }),
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: '500',
           },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+        }}>
+        
+        {/* Home */}
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: 'Home',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons 
+                name={focused ? "home" : "home-outline"} 
+                size={24} 
+                color={color} 
+              />
+            ),
+          }}
+        />
+
+        {/* Jornada */}
+        <Tabs.Screen
+          name="jornada"
+          options={{
+            title: 'Jornada',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons 
+                name={focused ? "car" : "car-outline"} 
+                size={24} 
+                color={color} 
+              />
+            ),
+          }}
+        />
+
+        {/* Finanças */}
+        <Tabs.Screen
+          name="financas"
+          options={{
+            title: 'Finanças',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons 
+                name={focused ? "wallet" : "wallet-outline"} 
+                size={24} 
+                color={color} 
+              />
+            ),
+          }}
+        />
+
+        {/* Agenda */}
+        <Tabs.Screen
+          name="agenda"
+          options={{
+            title: 'Agenda',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons 
+                name={focused ? "calendar" : "calendar-outline"} 
+                size={24} 
+                color={color} 
+              />
+            ),
+          }}
+        />
+
+        {/* Frota */}
+        <Tabs.Screen
+          name="frota"
+          options={{
+            title: 'Frota',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons 
+                name={focused ? "bus" : "bus-outline"} 
+                size={24} 
+                color={color} 
+              />
+            ),
+          }}
+        />
+
+        {/* Configurações */}
+        <Tabs.Screen
+          name="configuracoes"
+          options={{
+            title: 'Config',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons 
+                name={focused ? "settings" : "settings-outline"} 
+                size={24} 
+                color={color} 
+              />
+            ),
+          }}
+        />
+
+      </Tabs>
+    </VehicleRegistrationGuard>
   );
 }
