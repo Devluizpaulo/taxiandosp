@@ -2,6 +2,7 @@ import { profileSqliteService } from '@/services/sqlite/profileSqliteService';
 import { Ionicons } from '@expo/vector-icons';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
+import { Stack } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
 import { useEffect, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
@@ -64,66 +65,68 @@ function MenuButton() {
   );
 }
 
-export default function DrawerLayout() {
+export default function DrawerStackLayout() {
   return (
-    <Drawer
-      drawerContent={props => <CustomDrawerContent {...props} />}
-      screenOptions={{
-        headerShown: true,
-        drawerActiveTintColor: '#007AFF',
-        drawerLabelStyle: { fontWeight: 'bold' },
-        headerLeft: () => <MenuButton />,
-      }}
-    >
-      <Drawer.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          drawerIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
+    <Stack>
+      <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+      <Drawer
+        drawerContent={props => <CustomDrawerContent {...props} />}
+        screenOptions={{
+          headerShown: false,
+          drawerActiveTintColor: '#007AFF',
+          drawerLabelStyle: { fontWeight: 'bold' },
         }}
-      />
-      <Drawer.Screen
-        name="jornada/index"
-        options={{
-          title: 'Jornada',
-          drawerIcon: ({ color, size }) => <Ionicons name="car" size={size} color={color} />,
-        }}
-      />
-      <Drawer.Screen
-        name="financas/index"
-        options={{
-          title: 'Finanças',
-          drawerIcon: ({ color, size }) => <Ionicons name="wallet" size={size} color={color} />,
-        }}
-      />
-      <Drawer.Screen
-        name="agenda/index"
-        options={{
-          title: 'Agenda',
-          drawerIcon: ({ color, size }) => <Ionicons name="calendar" size={size} color={color} />,
-        }}
-      />
-      <Drawer.Screen
-        name="frota/index"
-        options={{
-          title: 'Frota',
-          drawerIcon: ({ color, size }) => <Ionicons name="bus" size={size} color={color} />,
-        }}
-      />
-      <Drawer.Screen
-        name="configuracoes/index"
-        options={{
-          title: 'Configurações',
-          drawerIcon: ({ color, size }) => <Ionicons name="settings" size={size} color={color} />,
-        }}
-      />
-      <Drawer.Screen
-        name="(tabs)"
-        options={{
-          title: 'Início',
-          drawerIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
-        }}
-      />
-    </Drawer>
+      >
+        <Drawer.Screen
+          name="index"
+          options={{
+            title: 'Home',
+            drawerIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
+          }}
+        />
+        <Drawer.Screen
+          name="jornada/index"
+          options={{
+            title: 'Jornada',
+            drawerIcon: ({ color, size }) => <Ionicons name="car" size={size} color={color} />,
+          }}
+        />
+        <Drawer.Screen
+          name="financas/index"
+          options={{
+            title: 'Finanças',
+            drawerIcon: ({ color, size }) => <Ionicons name="wallet" size={size} color={color} />,
+          }}
+        />
+        <Drawer.Screen
+          name="agenda/index"
+          options={{
+            title: 'Agenda',
+            drawerIcon: ({ color, size }) => <Ionicons name="calendar" size={size} color={color} />,
+          }}
+        />
+        <Drawer.Screen
+          name="frota/index"
+          options={{
+            title: 'Frota',
+            drawerIcon: ({ color, size }) => <Ionicons name="bus" size={size} color={color} />,
+          }}
+        />
+        <Drawer.Screen
+          name="configuracoes/index"
+          options={{
+            title: 'Configurações',
+            drawerIcon: ({ color, size }) => <Ionicons name="settings" size={size} color={color} />,
+          }}
+        />
+        <Drawer.Screen
+          name="(tabs)"
+          options={{
+            title: 'Início',
+            drawerIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
+          }}
+        />
+      </Drawer>
+    </Stack>
   );
 } 
