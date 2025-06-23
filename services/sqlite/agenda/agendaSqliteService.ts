@@ -5,38 +5,42 @@ const db = SQLite.openDatabaseSync('agenda.db');
 
 export const agendaSqliteService = {
   init() {
-    db.transaction(tx => {
-      tx.executeSql(`CREATE TABLE IF NOT EXISTS agenda (
-        id TEXT PRIMARY KEY, data TEXT, titulo TEXT, descricao TEXT, status TEXT, veiculoId TEXT, observacao TEXT
-      );`);
-    });
+    db.execSync(`CREATE TABLE IF NOT EXISTS agenda (
+      id TEXT PRIMARY KEY, data TEXT, titulo TEXT, descricao TEXT, status TEXT, veiculoId TEXT, observacao TEXT
+    );`);
   },
   getAllAgendaItems(): Promise<AgendaItem[]> {
     return new Promise((resolve, reject) => {
-      db.transaction(tx => {
-        tx.executeSql('SELECT * FROM agenda', [], (_, { rows }) => {
-          resolve(rows._array as AgendaItem[]);
-        }, (_, error) => { reject(error); return false; });
-      });
+      try {
+        const result = db.getAllSync('SELECT * FROM agenda');
+        resolve(result as AgendaItem[]);
+      } catch (error) {
+        reject(error);
+      }
     });
   },
   saveAgendaItem(item: AgendaItem): Promise<void> {
     return new Promise((resolve, reject) => {
-      db.transaction(tx => {
-        tx.executeSql(
+      try {
+        db.runSync(
           `REPLACE INTO agenda (id, data, titulo, descricao, status, veiculoId, observacao)
            VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [item.id, item.data, item.titulo, item.descricao, item.status, item.veiculoId, item.observacao],
-          () => resolve(), (_, error) => { reject(error); return false; }
+          [item.id, item.data, item.titulo, item.descricao, item.status, item.veiculoId, item.observacao]
         );
-      });
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
     });
   },
   deleteAgendaItem(id: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      db.transaction(tx => {
-        tx.executeSql('DELETE FROM agenda WHERE id = ?', [id], () => resolve(), (_, error) => { reject(error); return false; });
-      });
+      try {
+        db.runSync('DELETE FROM agenda WHERE id = ?', [id]);
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
     });
   },
 };

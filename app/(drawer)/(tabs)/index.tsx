@@ -93,16 +93,6 @@ export default function HomeScreen() {
         <RefreshControl refreshing={loading} onRefresh={onRefresh} />
       }
     >
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.card }]}>
-        <Text style={[styles.greeting, { color: colors.text }]}>
-          Olá, {user?.displayName || 'Usuário'}!
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Bem-vindo ao Taxiando
-        </Text>
-      </View>
-
       {/* Seletor de Data */}
       <PanGestureHandler>
         <Animated.View style={[styles.dateSelector, { backgroundColor: colors.card }]}>
@@ -299,18 +289,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    padding: 20,
-    paddingTop: 60,
-  },
-  greeting: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    fontSize: 16,
-    marginTop: 4,
   },
   dateSelector: {
     flexDirection: 'row',
