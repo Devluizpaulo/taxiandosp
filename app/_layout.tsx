@@ -5,7 +5,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import '@/services/databaseService'; // Garante a inicialização do DB
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack, router } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -17,12 +17,73 @@ import { combustivelSqliteService } from '@/services/sqlite/combustivel/combusti
 import { financasSqliteService } from '@/services/sqlite/financas/financasSqliteService';
 import { frotaSqliteService } from '@/services/sqlite/frota/frotaSqliteService';
 import { jornadaSqliteService } from '@/services/sqlite/jornada/jornadaSqliteService';
+import { profileSqliteService } from '@/services/sqlite/profileSqliteService';
+import { Ionicons } from '@expo/vector-icons';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import { NavigationContainer } from '@react-navigation/native';
+import * as Location from 'expo-location';
+import { getAuth } from 'firebase/auth';
+import { useState } from 'react';
+import { Image, Text, View } from 'react-native';
 
 financasSqliteService.init();
 agendaSqliteService.init();
 frotaSqliteService.init();
 jornadaSqliteService.init();
 combustivelSqliteService.init();
+
+const Drawer = createDrawerNavigator();
+
+function CustomDrawerContent(props) {
+  const [profile, setProfile] = useState(null);
+  const [temperature, setTemperature] = useState(null);
+  const [city, setCity] = useState('');
+
+  useEffect(() => {
+    // Buscar perfil local
+    (async () => {
+      const user = getAuth().currentUser;
+      if (user) {
+        const p = await profileSqliteService.getProfile(user.uid);
+        setProfile(p);
+      }
+    })();
+    // Buscar localização e temperatura
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') return;
+      let location = await Location.getCurrentPositionAsync({});
+      const lat = location.coords.latitude;
+      const lon = location.coords.longitude;
+      // Exemplo com OpenWeatherMap (substitua pela sua API_KEY)
+      const API_KEY = 'SUA_API_KEY';
+      try {
+        const resp = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}&lang=pt_br`);
+        const data = await resp.json();
+        setTemperature(Math.round(data.main.temp));
+        setCity(data.name);
+      } catch {}
+    })();
+  }, []);
+
+  return (
+    <DrawerContentScrollView {...props}>
+      <View style={{ alignItems: 'center', padding: 24, backgroundColor: '#f5f5f5' }}>
+        <Image
+          source={profile?.foto ? { uri: profile.foto } : require('@/assets/images/avatar-default.png')}
+          style={{ width: 72, height: 72, borderRadius: 36, marginBottom: 8 }}
+        />
+        <Text style={{ fontWeight: 'bold', fontSize: 18 }}>{profile?.nome || 'Usuário'}</Text>
+        {temperature !== null && (
+          <Text style={{ marginTop: 4, color: '#888' }}>
+            {city ? `${city} • ` : ''}{temperature}°C
+          </Text>
+        )}
+      </View>
+      <DrawerItemList {...props} />
+    </DrawerContentScrollView>
+  );
+}
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
@@ -83,7 +144,23 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
-        <RootLayoutNav />
+        <NavigationContainer>
+          <Drawer.Navigator
+            drawerContent={props => <CustomDrawerContent {...props} />}
+            screenOptions={{
+              headerShown: true,
+              drawerActiveTintColor: '#007AFF',
+              drawerLabelStyle: { fontWeight: 'bold' },
+            }}
+          >
+            <Drawer.Screen name="Home" component={RootLayoutNav} options={{ drawerIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} /> }} />
+            <Drawer.Screen name="Jornada" component={RootLayoutNav} options={{ drawerIcon: ({ color, size }) => <Ionicons name="car" size={size} color={color} /> }} />
+            <Drawer.Screen name="Finanças" component={RootLayoutNav} options={{ drawerIcon: ({ color, size }) => <Ionicons name="wallet" size={size} color={color} /> }} />
+            <Drawer.Screen name="Agenda" component={RootLayoutNav} options={{ drawerIcon: ({ color, size }) => <Ionicons name="calendar" size={size} color={color} /> }} />
+            <Drawer.Screen name="Frota" component={RootLayoutNav} options={{ drawerIcon: ({ color, size }) => <Ionicons name="bus" size={size} color={color} /> }} />
+            <Drawer.Screen name="Configurações" component={RootLayoutNav} options={{ drawerIcon: ({ color, size }) => <Ionicons name="settings" size={size} color={color} /> }} />
+          </Drawer.Navigator>
+        </NavigationContainer>
       </AuthProvider>
     </GestureHandlerRootView>
   );
